@@ -12,7 +12,6 @@ This project is an Automated Scientific Literature Review System focused on Alzh
 
 ## Installation
 
-
 <!-- ### No-setup Access (Recommended)
 
 You can access the interface of this project on this link: [autoreview.streamlit.app](autoreview.streamlit.app)  
@@ -37,3 +36,7 @@ streamlit run app.py
 Note: if prompted for email, just press enter and let it run until you see a localhost link
 
 After setting up, this app will be up and running on: [http://localhost:8501/](http://localhost:8501/)
+
+## Write-up
+
+See PDF file: `Project1_Automated_Scientific_Literature_Review.pdf` for write-up
