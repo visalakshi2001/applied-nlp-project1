@@ -8,13 +8,15 @@ st.set_page_config("Semantic Automated Literature Review", "💡")
 
 def main():
 
-    st.header("Literature Review", divider="violet")
+    st.header(" Automated Scientific Literature Review", divider="violet")
     st.write("*Literatures available for: :blue[Alzheimer Disease], :violet[its Biomarkers] and related content*")
     st.caption("*Search results on aspects outside of these topics might not be available, and can produce innacurate results*")
+    
+    
     st.write("---")
 
     cols = st.columns([0.8, 0.2])
-
+    st.caption("Get example search query from help '(?)' beside the text input")
     with cols[0]:
         keyword = st.text_input("Input keyword for research", help=EXAMPLE_KW)
     with cols[1]:

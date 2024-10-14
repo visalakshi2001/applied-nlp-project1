@@ -28,30 +28,29 @@ def load_model_and_tokenizer(model_name, task):
     elif task == "tokenclassify":
         model = AutoModelForTokenClassification.from_pretrained(model_name)
 
-    return model, tokenizer 
+    return model, tokenizer
+
+summary_model, summary_tokenizer =  load_model_and_tokenizer("facebook/bart-large-cnn", "seq2seq")
+ner_model, ner_tokenizer = load_model_and_tokenizer("alvaroalon2/biobert_genetic_ner", "tokenclassify")
 
 @st.cache_data()
 def generate_summary(text, max_length=2000, min_length=50):
 
-    model, tokenizer = load_model_and_tokenizer("facebook/bart-large-cnn", "seq2seq")
-
-    inputs = tokenizer.encode("summarize: " + text, return_tensors="pt", max_length=1024, truncation=True)
-    summary_ids = model.generate(inputs, max_length=max_length, min_length=min_length, length_penalty=2.0, num_beams=4, early_stopping=True)
-    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+    inputs = summary_tokenizer.encode("summarize: " + text, return_tensors="pt", max_length=1024, truncation=True)
+    summary_ids = summary_model.generate(inputs, max_length=max_length, min_length=min_length, length_penalty=2.0, num_beams=4, early_stopping=True)
+    summary = summary_tokenizer.decode(summary_ids[0], skip_special_tokens=True)
     
     return summary
 
 @st.cache_data()
 def perform_ner(text):
 
-    model, tokenizer = load_model_and_tokenizer("alvaroalon2/biobert_genetic_ner", "tokenclassify")
-
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
-    outputs = model(**inputs)
+    inputs = ner_tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+    outputs = ner_model(**inputs)
     predictions = torch.argmax(outputs.logits, dim=2)
     
-    tokens = tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
-    labels = [model.config.id2label[t.item()] for t in predictions[0]]
+    tokens = ner_tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
+    labels = [ner_model.config.id2label[t.item()] for t in predictions[0]]
     
     entities = []
     current_entity = ""
