@@ -36,4 +36,4 @@ streamlit run app.py
 
 Note: if prompted for email, just press enter and let it run until you see a localhost link
 
-This app will be up and running on: [http://localhost:8501/](http://localhost:8501/)
+After setting up, this app will be up and running on: [http://localhost:8501/](http://localhost:8501/)
