@@ -17,12 +17,17 @@ This project is an Automated Scientific Literature Review System focused on Alzh
 - pip
 - virtualenv (recommended)
 
-### Setup (Optional)
+### No-setup Access (Recommended)
+
+You can access the interface of this project on this link: [autoreview.streamlit.app](autoreview.streamlit.app)
+
+### Setup and Run
 After cloning the repository into an environment, install the required packages using the following command on your terminal in the directory of the project:
 ```
 pip install -r requirements.txt
 ```
 
-### No-setup Access (Recommended)
-
-You can access the interface of this project on this link: autoreview.streamlit.app
+Then run the following command on your terminal to start the app
+```
+streamlit run app.py
+```
