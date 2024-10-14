@@ -3,26 +3,27 @@ import cohere
 from pinecone import Pinecone, ServerlessSpec
 import os
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def authenticate_co_pc():
     from cache import COHERE_API_KEY, PINECONE_API_KEY
-    global pc 
-    global co
 
     co = cohere.Client(COHERE_API_KEY)
     pc = Pinecone(PINECONE_API_KEY)
 
     return pc, co
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def retrieve_similar_articles(keyword: str, k: int = 5):
-    authenticate_co_pc()
+
+    global pc
+    global co
+    
+    pc, co = authenticate_co_pc()
 
     index_name = "scientific-papers"
     index = pc.Index(index_name)
     print(f"Opened index {index_name}")
 
-    # Generate embedding for the keyword
     query_embedding = co.embed(
         texts=[keyword],
         model="embed-english-v3.0",
@@ -42,3 +43,27 @@ def retrieve_similar_articles(keyword: str, k: int = 5):
         })
 
     return similar_articles
+
+
+EXAMPLE_KW = """
+    "Alzheimer's disease biomarkers",
+    "Early detection of Alzheimer's",
+    "Blood-based biomarkers for Alzheimer's",
+    "Amyloid PET imaging in Alzheimer's",
+    "Tau protein as Alzheimer's biomarker",
+    "Cerebrospinal fluid biomarkers in Alzheimer's",
+    "Genetic risk factors for Alzheimer's",
+    "Neurofilament light chain in Alzheimer's",
+    "Lipid biomarkers for Alzheimer's",
+    "Alzheimer's disease progression markers",
+    "Non-invasive Alzheimer's diagnostic tools",
+    "Molecular imaging in Alzheimer's diagnosis",
+    "Cognitive decline markers in Alzheimer's",
+    "Predictive biomarkers for Alzheimer's",
+    "Alzheimer's disease neuroimaging initiative",
+    "Proteomics in Alzheimer's research",
+    "Fluid biomarkers for Alzheimer's",
+    "Eye and vision changes in Alzheimer's",
+    "Sleep disturbances as Alzheimer's biomarkers",
+    "Standardization of Alzheimer's biomarkers"
+"""

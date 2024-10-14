@@ -1,20 +1,81 @@
 import streamlit as st
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForTokenClassification
+import torch
 
 
-
-@st.cache_resource
+@st.cache_data(show_spinner=False)
 def load_literature():
-    papers = pd.concat([pd.read_csv("/content/alzheimer_biomarker_1000.csv"), 
-                        pd.read_csv("/content/alzheimer_biomarker_2000.csv")]) \
+    papers = pd.concat([pd.read_csv("data/alzheimer_biomarker_1000.csv"), 
+                        pd.read_csv("data/alzheimer_biomarker_2000.csv")]) \
                             .dropna(subset=["fulltext"]).reset_index(drop=True) \
                                 .astype(str)
     return papers
 
-@st.cache_resource
-def load_model_and_tokenizer():
-    model_name = "facebook/bart-large-cnn"
+@st.cache_data(show_spinner=False)
+def load_paper(id):
+
+    papers = load_literature()
+
+    return papers[papers["pmcid"] == id]
+    
+
+@st.cache_resource(show_spinner=False)
+def load_model_and_tokenizer(model_name, task):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+    if task == "seq2seq":
+        model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+    elif task == "tokenclassify":
+        model = AutoModelForTokenClassification.from_pretrained(model_name)
+
     return model, tokenizer 
+
+@st.cache_data()
+def generate_summary(text, max_length=2000, min_length=50):
+
+    model, tokenizer = load_model_and_tokenizer("facebook/bart-large-cnn", "seq2seq")
+
+    inputs = tokenizer.encode("summarize: " + text, return_tensors="pt", max_length=1024, truncation=True)
+    summary_ids = model.generate(inputs, max_length=max_length, min_length=min_length, length_penalty=2.0, num_beams=4, early_stopping=True)
+    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+    
+    return summary
+
+@st.cache_data()
+def perform_ner(text):
+
+    model, tokenizer = load_model_and_tokenizer("alvaroalon2/biobert_genetic_ner", "tokenclassify")
+
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+    outputs = model(**inputs)
+    predictions = torch.argmax(outputs.logits, dim=2)
+    
+    tokens = tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
+    labels = [model.config.id2label[t.item()] for t in predictions[0]]
+    
+    entities = []
+    current_entity = ""
+    current_label = ""
+    
+    for token, label in zip(tokens, labels):
+        if label.startswith("B-"):
+            if current_entity:
+                entities.append((current_entity.strip(), current_label))
+            current_entity = token.replace("#", "")
+            current_label = label[2:]
+        elif label.startswith("I-"):
+            current_entity += " " + token.replace("#", "")
+        else:
+            if current_entity:
+                entities.append((current_entity.strip(), current_label))
+            current_entity = ""
+            current_label = ""
+    
+    if current_entity:
+        entities.append((current_entity.strip(), current_label))
+
+    for i, (e, l) in enumerate(entities):
+        entities[i] = (e.replace(" ", ""), l)
+
+    
+    return entities
