@@ -22,11 +22,13 @@ def load_paper(id):
 
 @st.cache_resource(show_spinner=False)
 def load_model_and_tokenizer(model_name, task):
+    # START OF DOCUMENTATION CODE: https://huggingface.co/docs/transformers/en/model_doc/auto
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     if task == "seq2seq":
         model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
     elif task == "tokenclassify":
         model = AutoModelForTokenClassification.from_pretrained(model_name)
+    # END OF CODE FROM https://huggingface.co/docs/transformers/en/model_doc/auto
 
     return model, tokenizer
 

@@ -24,13 +24,17 @@ def retrieve_similar_articles(keyword: str, k: int = 5):
     index = pc.Index(index_name)
     print(f"Opened index {index_name}")
 
+    # DOCUMENTATION CODE: https://docs.cohere.com/v2/reference/embed
     query_embedding = co.embed(
         texts=[keyword],
         model="embed-english-v3.0",
         input_type="search_query"
     ).embeddings
-
+    # END OF DOCUMENTATION CODE https://docs.cohere.com/v2/reference/embed
+    
+    # DOCUMENTATION CODE https://docs.pinecone.io/guides/get-started/quickstart
     results = index.query(vector=query_embedding, top_k=k, include_metadata=True)
+    # END OF DOCUMENTATION CODE https://docs.pinecone.io/guides/get-started/quickstart
 
     similar_articles = []
     for match in results['matches']:
