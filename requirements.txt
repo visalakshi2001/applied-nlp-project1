@@ -1,4 +1,5 @@
-pinecone-client
+pinecone
+hf_xet
 cohere
 streamlit==1.39.0
 tensorflow==2.17.0

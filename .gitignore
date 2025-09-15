@@ -2,3 +2,5 @@ alr/
 __pycache__/
 link.txt
 cache.txt
+cache.py
+.streamlit/
