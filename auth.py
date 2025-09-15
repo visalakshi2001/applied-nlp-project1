@@ -4,11 +4,14 @@ from pinecone import Pinecone, ServerlessSpec
 import os
 
 @st.cache_resource(show_spinner=False)
-def authenticate_co_pc():
-    from cache import COHERE_API_KEY, PINECONE_API_KEY
+def initiate_cohere():
+    co = cohere.Client(api_key=st.secrets["COHERE_API_KEY"]) 
+    return co  
 
-    co = cohere.Client(COHERE_API_KEY)
-    pc = Pinecone(PINECONE_API_KEY)
+@st.cache_resource(show_spinner=False)
+def authenticate_co_pc():
+    co = initiate_cohere()
+    pc = Pinecone(st.secrets["PINECONE_API_KEY"])
 
     return pc, co
 

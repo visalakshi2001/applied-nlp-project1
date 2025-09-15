@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForTokenClassification
 import torch
-
+from auth import initiate_cohere
 
 @st.cache_data(show_spinner=False)
 def load_literature():
@@ -18,7 +18,6 @@ def load_paper(id):
     papers = load_literature()
 
     return papers[papers["pmcid"] == id]
-    
 
 @st.cache_resource(show_spinner=False)
 def load_model_and_tokenizer(model_name, task):
@@ -38,11 +37,24 @@ ner_model, ner_tokenizer = load_model_and_tokenizer("alvaroalon2/biobert_genetic
 @st.cache_data()
 def generate_summary(text, max_length=2000, min_length=50):
 
-    inputs = summary_tokenizer.encode("summarize: " + text, return_tensors="pt", max_length=1024, truncation=True)
-    summary_ids = summary_model.generate(inputs, max_length=max_length, min_length=min_length, length_penalty=2.0, num_beams=4, early_stopping=True)
-    summary = summary_tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+    # inputs = summary_tokenizer.encode("summarize: " + text, return_tensors="pt", max_length=1024, truncation=True)
+    # summary_ids = summary_model.generate(inputs, max_length=max_length, min_length=min_length, length_penalty=2.0, num_beams=4, early_stopping=True)
+    # summary = summary_tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+
+    co = initiate_cohere()
+
+    message = f"""Generate a concise summary of this text in 320 words. 
+                Do not use any or start with referencing the given text like 'this text discusses', 'the passage talks about', 'this study', 'this review', etc.
+                Do not use bullet points, lists or headings.
+
+                Just focus on pure summarization and each word should be the content of the summarization. \n{text}"""
+
+    response = co.chat(
+        model="command-r7b-12-2024",
+        message=message
+    )
     
-    return summary
+    return response.text
 
 @st.cache_data()
 def perform_ner(text):
