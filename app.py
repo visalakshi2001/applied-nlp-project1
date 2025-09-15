@@ -21,11 +21,13 @@ def main():
     st.write("---")
 
     cols = st.columns([0.8, 0.2])
-    st.caption("Get example search query from help '(?)' beside the text input")
+    # st.caption("Get example search query from help '(?)' beside the text input")
     with cols[0]:
         keyword = st.text_input("Input keyword for research", help=EXAMPLE_KW)
     with cols[1]:
         k = st.number_input("Number of papers", value=5, max_value=15)
+    with st.expander("Get example search query from here"):
+        st.write("\n".join(EXAMPLE_KW.split(",")))
 
     if keyword:
         st.subheader(f"Top {k} relevant papers on your provided keyword", )
