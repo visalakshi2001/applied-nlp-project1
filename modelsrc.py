@@ -43,7 +43,7 @@ def generate_summary(text, max_length=2000, min_length=50):
 
     co = initiate_cohere()
 
-    message = f"""Generate a concise summary of this text in 320 words. 
+    message = f"""Generate a concise summary of this text in STRICTLY under 260 words. 
                 Do not use any or start with referencing the given text like 'this text discusses', 'the passage talks about', 'this study', 'this review', etc.
                 Do not use bullet points, lists or headings.
 

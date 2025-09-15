@@ -3,7 +3,7 @@ import pandas as pd
 from auth import retrieve_similar_articles, EXAMPLE_KW
 from modelsrc import load_paper, generate_summary, perform_ner
 
-st.set_page_config("Semantic Automated Literature Review", "💡")
+st.set_page_config("Semantic Automated Literature Review", "💡", layout="wide")
 
 
 def main():
